@@ -42,7 +42,7 @@ export class Machine {
   @Column({ type: 'varchar', length: 255, nullable: true })
   location: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastMaintenance: Date;
 
   @Column({ type: 'int', default: 0 })
