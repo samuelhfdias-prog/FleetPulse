@@ -1,0 +1,97 @@
+<div class="crud-container">
+  <div class="crud-header">
+    <h2>Gerenciamento de Usuários</h2>
+    <button class="btn btn-primary" (click)="openForm()" *ngIf="!showForm">
+      + Novo Usuário
+    </button>
+  </div>
+
+  <div class="crud-form-container fade-in" *ngIf="showForm">
+    <h3>{{ isEditing ? 'Editar Usuário' : 'Cadastrar Novo Usuário' }}</h3>
+    
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="crud-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome Completo</label>
+          <input type="text" formControlName="fullName" placeholder="Ex: João Silva">
+        </div>
+        <div class="form-group">
+          <label>Email Corporativo</label>
+          <input type="email" formControlName="email" placeholder="Ex: joao@empresa.com.br">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nível de Acesso</label>
+          <select formControlName="role">
+            <option value="USER">Usuário Padrão</option>
+            <option value="ADMIN">Administrador Geral</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Empresa Vinculada</label>
+          <select formControlName="companyId">
+            <option value="" disabled selected>Selecione uma empresa</option>
+            <option *ngFor="let c of companies" [value]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex: 0.48">
+          <label>Senha de Acesso {{ isEditing ? '(Opcional)' : '' }}</label>
+          <input type="password" formControlName="password" placeholder="••••••••">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid || loading">
+          {{ loading ? 'Salvando...' : 'Salvar Usuário' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-container" *ngIf="!showForm">
+    <div class="loading-state" *ngIf="loading">
+      Carregando usuários...
+    </div>
+
+    <table class="crud-table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Nível de Acesso</th>
+          <th>Empresa</th>
+          <th class="actions-col">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of users">
+          <td class="primary-col">
+            <span class="m-name">{{ u.fullName }}</span>
+          </td>
+          <td>{{ u.email }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="u.role === 'ADMIN' ? 'status-maintenance' : 'status-operational'">
+              {{ u.role === 'ADMIN' ? 'Administrador' : 'Usuário' }}
+            </span>
+          </td>
+          <td>{{ u.companyId }}</td>
+          <td class="actions-col">
+            <button class="btn-icon btn-edit" (click)="openForm(u)" title="Editar">✏️</button>
+            <button class="btn-icon btn-delete" (click)="deleteUser(u.id)" title="Excluir">🗑️</button>
+          </td>
+        </tr>
+        <tr *ngIf="users.length === 0">
+          <td colspan="5" class="empty-table">
+            Nenhum usuário cadastrado.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

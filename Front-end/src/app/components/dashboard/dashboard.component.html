@@ -126,24 +126,15 @@
     <!-- Tab Content -->
     <div class="tab-content">
       <div *ngIf="activeTab === 'maquinas'" class="tab-pane fade-in">
-        <div class="empty-state">
-          <h3>Nenhuma máquina selecionada</h3>
-          <p>O módulo de máquinas será exibido aqui.</p>
-        </div>
+        <app-machines-crud></app-machines-crud>
       </div>
 
       <div *ngIf="activeTab === 'usuarios'" class="tab-pane fade-in">
-        <div class="empty-state">
-          <h3>Gerenciamento de Usuários</h3>
-          <p>Selecione um usuário para editar suas permissões.</p>
-        </div>
+        <app-users-crud></app-users-crud>
       </div>
 
       <div *ngIf="activeTab === 'empresas'" class="tab-pane fade-in">
-        <div class="empty-state">
-          <h3>Lista de Empresas</h3>
-          <p>Aqui você poderá ver as empresas cadastradas no sistema.</p>
-        </div>
+        <app-companies-crud></app-companies-crud>
       </div>
     </div>
   </div>

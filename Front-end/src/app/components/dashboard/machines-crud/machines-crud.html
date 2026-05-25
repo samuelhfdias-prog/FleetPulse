@@ -1,0 +1,105 @@
+<div class="crud-container">
+  <div class="crud-header">
+    <h2>Gerenciamento de Máquinas</h2>
+    <button class="btn btn-primary" (click)="openForm()" *ngIf="!showForm">
+      + Nova Máquina
+    </button>
+  </div>
+
+  <!-- Formulário (Adicionar / Editar) -->
+  <div class="crud-form-container fade-in" *ngIf="showForm">
+    <h3>{{ isEditing ? 'Editar Máquina' : 'Cadastrar Nova Máquina' }}</h3>
+    
+    <form [formGroup]="machineForm" (ngSubmit)="onSubmit()" class="crud-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome do Equipamento</label>
+          <input type="text" formControlName="name" placeholder="Ex: Separadora S200">
+        </div>
+        <div class="form-group">
+          <label>Modelo</label>
+          <input type="text" formControlName="model" placeholder="Ex: S200-Pro">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Número de Série</label>
+          <input type="text" formControlName="serialNumber" placeholder="Ex: 9999-XXXX">
+        </div>
+        <div class="form-group">
+          <label>Tipo de Equipamento</label>
+          <input type="text" formControlName="equipmentType" placeholder="Ex: Tratamento">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status Atual</label>
+          <select formControlName="status">
+            <option value="OPERATIONAL">Operacional</option>
+            <option value="MAINTENANCE">Manutenção</option>
+            <option value="IDLE">Inativo (Pausado)</option>
+            <option value="INACTIVE">Desativado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Localização / Unidade</label>
+          <input type="text" formControlName="location" placeholder="Ex: Galpão Central">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="machineForm.invalid || loading">
+          {{ loading ? 'Salvando...' : 'Salvar Máquina' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabela de Listagem -->
+  <div class="table-container" *ngIf="!showForm">
+    <div class="loading-state" *ngIf="loading">
+      Carregando máquinas...
+    </div>
+
+    <table class="crud-table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Equipamento</th>
+          <th>Modelo</th>
+          <th>Série</th>
+          <th>Status</th>
+          <th>Horas/Op</th>
+          <th class="actions-col">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of machines">
+          <td class="primary-col">
+            <span class="m-name">{{ m.name }}</span>
+            <span class="m-type">{{ m.equipmentType }}</span>
+          </td>
+          <td>{{ m.model }}</td>
+          <td>{{ m.serialNumber }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(m.status)">
+              {{ m.status }}
+            </span>
+          </td>
+          <td>{{ m.operatingHours }}h</td>
+          <td class="actions-col">
+            <button class="btn-icon btn-edit" (click)="openForm(m)" title="Editar">✏️</button>
+            <button class="btn-icon btn-delete" (click)="deleteMachine(m.id)" title="Excluir">🗑️</button>
+          </td>
+        </tr>
+        <tr *ngIf="machines.length === 0">
+          <td colspan="6" class="empty-table">
+            Nenhuma máquina encontrada no sistema.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

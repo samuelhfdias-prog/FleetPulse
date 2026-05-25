@@ -4,10 +4,15 @@ import { AuthService, User } from '../../services/auth.service';
 import { MachinesService, MachineStats } from '../../services/machines.service';
 import { Router } from '@angular/router';
 
+// CRUD Components
+import { MachinesCrud } from './machines-crud/machines-crud';
+import { UsersCrud } from './users-crud/users-crud';
+import { CompaniesCrud } from './companies-crud/companies-crud';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MachinesCrud, UsersCrud, CompaniesCrud],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
