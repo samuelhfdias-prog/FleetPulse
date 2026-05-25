@@ -37,9 +37,9 @@ async function bootstrap() {
     console.log('Seeding initial demo data...');
     const company = await companyRepository.save(companyRepository.create({
       name: 'Momesso Indústria',
-      cnpj: '00000000000000',
-      fantasyName: 'Momesso',
-      email: 'contato@momesso.ind.br'
+      document: '00000000000000',
+      industry: 'Agroindústria',
+      contactEmail: 'contato@momesso.ind.br'
     }));
 
     await userRepository.save(userRepository.create({
