@@ -33,31 +33,39 @@ async function bootstrap() {
   const userRepository = dataSource.getRepository(User);
   const companyRepository = dataSource.getRepository(Company);
 
-  if (await userRepository.count() === 0) {
-    console.log('Seeding initial demo data...');
-    const company = await companyRepository.save(companyRepository.create({
+  let defaultCompany = await companyRepository.findOne({ where: { document: '00000000000000' } });
+  if (!defaultCompany) {
+    console.log('Seeding initial company...');
+    defaultCompany = await companyRepository.save(companyRepository.create({
       name: 'Momesso Indústria',
       document: '00000000000000',
       industry: 'Agroindústria',
       contactEmail: 'contato@momesso.ind.br'
     }));
+  }
 
+  const adminExists = await userRepository.findOne({ where: { email: 'suporte@momesso.ind.br' } });
+  if (!adminExists) {
+    console.log('Seeding admin user...');
     await userRepository.save(userRepository.create({
       email: 'suporte@momesso.ind.br',
       passwordHash: await bcrypt.hash('123456', 10),
       fullName: 'Administrador Sistema',
       role: UserRole.ADMIN,
-      companyId: company.id
+      companyId: defaultCompany.id
     }));
+  }
 
+  const gerenteExists = await userRepository.findOne({ where: { email: 'gerente@agroforte.com.br' } });
+  if (!gerenteExists) {
+    console.log('Seeding gerente user...');
     await userRepository.save(userRepository.create({
       email: 'gerente@agroforte.com.br',
       passwordHash: await bcrypt.hash('123456', 10),
       fullName: 'Gerente Agroforte',
       role: UserRole.USER,
-      companyId: company.id
+      companyId: defaultCompany.id
     }));
-    console.log('Demo data seeded successfully!');
   }
 
   const port = process.env.API_PORT || 3000;
