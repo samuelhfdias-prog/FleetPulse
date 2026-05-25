@@ -1,9 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UsersService } from '../../../../services/users.service';
-import { CompaniesService } from '../../../../services/companies.service';
-import { User, Company } from '../../../../models/data.models';
+import { UsersService } from '../../../services/users.service';
+import { CompaniesService } from '../../../services/companies.service';
+import { User, Company } from '../../../models/data.models';
 
 @Component({
   selector: 'app-users-crud',
@@ -43,11 +43,11 @@ export class UsersCrud implements OnInit {
   loadUsers(): void {
     this.loading = true;
     this.usersService.getUsers().subscribe({
-      next: (data) => {
+      next: (data: User[]) => {
         this.users = data;
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erro ao carregar usuários', err);
         this.loading = false;
       }
@@ -56,8 +56,8 @@ export class UsersCrud implements OnInit {
 
   loadCompanies(): void {
     this.companiesService.getCompanies().subscribe({
-      next: (data) => this.companies = data,
-      error: (err) => console.error('Erro ao carregar empresas', err)
+      next: (data: Company[]) => this.companies = data,
+      error: (err: any) => console.error('Erro ao carregar empresas', err)
     });
   }
 
@@ -105,7 +105,7 @@ export class UsersCrud implements OnInit {
           this.loadUsers();
           this.closeForm();
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao atualizar usuário', err);
           this.loading = false;
         }
@@ -116,7 +116,7 @@ export class UsersCrud implements OnInit {
           this.loadUsers();
           this.closeForm();
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao criar usuário', err);
           this.loading = false;
         }
@@ -129,7 +129,7 @@ export class UsersCrud implements OnInit {
       this.loading = true;
       this.usersService.deleteUser(id).subscribe({
         next: () => this.loadUsers(),
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao excluir usuário', err);
           this.loading = false;
         }

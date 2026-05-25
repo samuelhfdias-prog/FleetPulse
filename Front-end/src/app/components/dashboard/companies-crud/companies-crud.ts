@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CompaniesService } from '../../../../services/companies.service';
-import { Company } from '../../../../models/data.models';
+import { CompaniesService } from '../../../services/companies.service';
+import { Company } from '../../../models/data.models';
 
 @Component({
   selector: 'app-companies-crud',
@@ -42,11 +42,11 @@ export class CompaniesCrud implements OnInit {
   loadCompanies(): void {
     this.loading = true;
     this.companiesService.getCompanies().subscribe({
-      next: (data) => {
+      next: (data: Company[]) => {
         this.companies = data;
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erro ao carregar empresas', err);
         this.loading = false;
       }
@@ -83,7 +83,7 @@ export class CompaniesCrud implements OnInit {
           this.loadCompanies();
           this.closeForm();
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao atualizar empresa', err);
           this.loading = false;
         }
@@ -94,7 +94,7 @@ export class CompaniesCrud implements OnInit {
           this.loadCompanies();
           this.closeForm();
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao criar empresa', err);
           this.loading = false;
         }
@@ -107,7 +107,7 @@ export class CompaniesCrud implements OnInit {
       this.loading = true;
       this.companiesService.deleteCompany(id).subscribe({
         next: () => this.loadCompanies(),
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao excluir empresa', err);
           this.loading = false;
         }

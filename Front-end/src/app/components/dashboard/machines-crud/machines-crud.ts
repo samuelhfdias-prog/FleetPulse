@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MachinesService, Machine } from '../../../../services/machines.service';
+import { MachinesService, Machine } from '../../../services/machines.service';
 
 @Component({
   selector: 'app-machines-crud',
@@ -39,11 +39,11 @@ export class MachinesCrud implements OnInit {
   loadMachines(): void {
     this.loading = true;
     this.machinesService.getMachines().subscribe({
-      next: (data) => {
+      next: (data: Machine[]) => {
         this.machines = data;
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erro ao carregar máquinas', err);
         this.loading = false;
       }
@@ -80,7 +80,7 @@ export class MachinesCrud implements OnInit {
           this.loadMachines();
           this.closeForm();
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao atualizar máquina', err);
           this.loading = false;
         }
@@ -91,7 +91,7 @@ export class MachinesCrud implements OnInit {
           this.loadMachines();
           this.closeForm();
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao criar máquina', err);
           this.loading = false;
         }
@@ -104,7 +104,7 @@ export class MachinesCrud implements OnInit {
       this.loading = true;
       this.machinesService.deleteMachine(id).subscribe({
         next: () => this.loadMachines(),
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao excluir máquina', err);
           this.loading = false;
         }
