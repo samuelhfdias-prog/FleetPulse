@@ -36,7 +36,7 @@ export class Machine {
   @Column({ type: 'date', nullable: true })
   installationDate: Date;
 
-  @Column({ type: 'enum', enum: MachineStatus, default: MachineStatus.OPERATIONAL })
+  @Column({ type: 'simple-enum', enum: MachineStatus, default: MachineStatus.OPERATIONAL })
   status: MachineStatus;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
