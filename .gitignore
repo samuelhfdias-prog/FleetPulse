@@ -39,6 +39,16 @@ testem.log
 /typings
 __screenshots__/
 
+# Environment variables (secrets)
+.env
+.env.local
+.env.*.local
+!.env.example
+
 # System files
 .DS_Store
 Thumbs.db
+
+# Database
+*.sqlite
+*.sqlite-journal

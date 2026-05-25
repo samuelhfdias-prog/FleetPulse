@@ -9,3 +9,8 @@ node_modules/
 .vscode/
 *.swp
 *.swo
+
+# Secrets & Database
+.env
+*.sqlite
+*.sqlite-journal
