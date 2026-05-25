@@ -1,0 +1,79 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: momesso_db
+    environment:
+      POSTGRES_DB: momesso_db
+      POSTGRES_USER: momesso_user
+      POSTGRES_PASSWORD: momesso_secure_pass_2024
+      TZ: America/Sao_Paulo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./db/init-policies.sql:/docker-entrypoint-initdb.d/02-policies.sql
+      - ./db/seed-data.sql:/docker-entrypoint-initdb.d/03-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U momesso_user -d momesso_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - momesso_network
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: momesso_api
+    environment:
+      NODE_ENV: development
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: momesso_user
+      DATABASE_PASSWORD: momesso_secure_pass_2024
+      DATABASE_NAME: momesso_db
+      JWT_SECRET: momesso_jwt_secret_key_v2024_test_only
+      JWT_EXPIRATION: 3600
+      API_PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api/src:/app/src
+      - /app/node_modules
+    networks:
+      - momesso_network
+    command: npm run start:dev
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: momesso_web
+    environment:
+      NODE_ENV: development
+    ports:
+      - "4200:4200"
+    depends_on:
+      - api
+    volumes:
+      - ./web/src:/app/src
+      - /app/node_modules
+    networks:
+      - momesso_network
+    command: ng serve --host 0.0.0.0 --poll 2000
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  momesso_network:
+    driver: bridge

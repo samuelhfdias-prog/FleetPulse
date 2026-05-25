@@ -1,0 +1,11 @@
+# NestJS API
+.env.local
+.env.*.local
+dist/
+node_modules/
+*.log
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo

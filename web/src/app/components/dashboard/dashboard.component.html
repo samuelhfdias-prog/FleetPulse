@@ -1,0 +1,107 @@
+<div class="dashboard-container">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <img src="assets/Logo Momesso.png" alt="Momesso" class="navbar-logo" />
+      <span class="navbar-title">MOMESSO</span>
+    </div>
+    <div class="navbar-user">
+      <span class="user-name">{{ currentUser?.fullName }}</span>
+      <button class="logout-btn" (click)="logout()">Sair</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="dashboard-content">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <h1 class="page-title">
+        {{ currentUser?.role === 'ADMIN' ? 'Visão Global do Parque' : 'Parque de Máquinas' }}
+      </h1>
+      <p class="page-subtitle">
+        {{ currentUser?.role === 'ADMIN'
+          ? 'Monitoramento de todas as empresas clientes'
+          : 'Status operacional das suas máquinas'
+        }}
+      </p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid" *ngIf="stats">
+      <div class="stat-card operational">
+        <div class="stat-icon">⚙️</div>
+        <div class="stat-content">
+          <h3>Operacional</h3>
+          <p class="stat-number">{{ stats.operational }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card maintenance">
+        <div class="stat-icon">🔧</div>
+        <div class="stat-content">
+          <h3>Manutenção</h3>
+          <p class="stat-number">{{ stats.maintenance }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card idle">
+        <div class="stat-icon">⏸️</div>
+        <div class="stat-content">
+          <h3>Inativo</h3>
+          <p class="stat-number">{{ stats.idle }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card total">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <h3>Total</h3>
+          <p class="stat-number">{{ stats.total }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Industrial Background -->
+    <div class="industrial-section">
+      <div class="industrial-bg">
+        <img 
+          src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=1200&h=400&fit=crop" 
+          alt="Industrial machinery" 
+          class="industrial-image"
+        />
+        <div class="industrial-overlay">
+          <h2>Tecnologia Agrícola de Ponta</h2>
+          <p>Equipamentos Momesso para máxima eficiência no beneficiamento de sementes</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Máquinas Instaladas</h3>
+        <p class="info-number">{{ stats?.total || 0 }}</p>
+        <p class="info-text">Unidades operando em sua rede</p>
+      </div>
+
+      <div class="info-card">
+        <h3>Taxa de Operação</h3>
+        <p class="info-number">{{ operationRate }}%</p>
+        <p class="info-text">Máquinas em funcionamento</p>
+      </div>
+
+      <div class="info-card">
+        <h3>Horas Médias</h3>
+        <p class="info-number">{{ stats?.averageOperatingHours || 0 }}h</p>
+        <p class="info-text">Tempo médio de operação</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-primary">📋 Ver Máquinas</button>
+      <button class="btn btn-secondary">👥 Gerenciar Usuários</button>
+      <button class="btn btn-secondary" *ngIf="currentUser?.role === 'ADMIN'">🏢 Empresas</button>
+    </div>
+  </div>
+</div>
