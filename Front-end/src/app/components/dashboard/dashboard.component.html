@@ -99,9 +99,52 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button class="btn btn-primary">📋 Ver Máquinas</button>
-      <button class="btn btn-secondary">👥 Gerenciar Usuários</button>
-      <button class="btn btn-secondary" *ngIf="currentUser?.role === 'ADMIN'">🏢 Empresas</button>
+      <button 
+        class="btn" 
+        [class.btn-primary]="activeTab === 'maquinas'"
+        [class.btn-secondary]="activeTab !== 'maquinas'"
+        (click)="setTab('maquinas')">
+        📋 Ver Máquinas
+      </button>
+      <button 
+        class="btn" 
+        [class.btn-primary]="activeTab === 'usuarios'"
+        [class.btn-secondary]="activeTab !== 'usuarios'"
+        (click)="setTab('usuarios')">
+        👥 Gerenciar Usuários
+      </button>
+      <button 
+        class="btn" 
+        [class.btn-primary]="activeTab === 'empresas'"
+        [class.btn-secondary]="activeTab !== 'empresas'"
+        *ngIf="currentUser?.role === 'ADMIN'"
+        (click)="setTab('empresas')">
+        🏢 Empresas
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <div *ngIf="activeTab === 'maquinas'" class="tab-pane fade-in">
+        <div class="empty-state">
+          <h3>Nenhuma máquina selecionada</h3>
+          <p>O módulo de máquinas será exibido aqui.</p>
+        </div>
+      </div>
+
+      <div *ngIf="activeTab === 'usuarios'" class="tab-pane fade-in">
+        <div class="empty-state">
+          <h3>Gerenciamento de Usuários</h3>
+          <p>Selecione um usuário para editar suas permissões.</p>
+        </div>
+      </div>
+
+      <div *ngIf="activeTab === 'empresas'" class="tab-pane fade-in">
+        <div class="empty-state">
+          <h3>Lista de Empresas</h3>
+          <p>Aqui você poderá ver as empresas cadastradas no sistema.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

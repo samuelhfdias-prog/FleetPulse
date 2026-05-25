@@ -19,6 +19,12 @@ export class DashboardComponent implements OnInit {
   currentUser: User | null = null;
   stats: MachineStats | null = null;
   operationRate = 0;
+  
+  activeTab: 'maquinas' | 'usuarios' | 'empresas' = 'maquinas';
+
+  setTab(tab: 'maquinas' | 'usuarios' | 'empresas'): void {
+    this.activeTab = tab;
+  }
 
   ngOnInit(): void {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
