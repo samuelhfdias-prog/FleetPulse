@@ -14,7 +14,7 @@ import { User } from '../users/user.entity';
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'momesso_jwt_secret_key_v2024_test_only',
       signOptions: {
-        expiresIn: process.env.JWT_EXPIRATION || '3600s',
+        expiresIn: parseInt(process.env.JWT_EXPIRATION || '3600', 10),
       },
     }),
   ],

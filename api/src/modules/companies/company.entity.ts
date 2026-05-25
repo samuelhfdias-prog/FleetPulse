@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
-import { User } from './user.entity';
-import { Machine } from './machine.entity';
+import { User } from '../users/user.entity';
+import { Machine } from '../machines/machine.entity';
 
 @Entity('companies')
 @Index(['isActive'])

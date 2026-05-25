@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { User } from '../users/user.entity';
+import { User, UserRole } from '../users/user.entity';
 import { LoginDto, CreateUserDto, AuthResponseDto } from './dto/auth.dto';
 import { JwtPayload } from '@/common/decorators/get-user.decorator';
 
@@ -37,7 +37,7 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: process.env.JWT_EXPIRATION || '3600s',
+      expiresIn: parseInt(process.env.JWT_EXPIRATION || '3600', 10),
     });
 
     return {
@@ -66,7 +66,7 @@ export class AuthService {
     const user = this.usersRepository.create({
       ...createUserDto,
       passwordHash: hashedPassword,
-      role: createUserDto.role || 'USER',
+      role: createUserDto.role || UserRole.USER,
     });
 
     await this.usersRepository.save(user);
@@ -79,7 +79,7 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: process.env.JWT_EXPIRATION || '3600s',
+      expiresIn: parseInt(process.env.JWT_EXPIRATION || '3600', 10),
     });
 
     return {

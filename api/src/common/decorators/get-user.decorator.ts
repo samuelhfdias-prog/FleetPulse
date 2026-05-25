@@ -8,14 +8,14 @@ export interface JwtPayload {
 }
 
 export const GetUser = createParamDecorator(
-  (data: keyof JwtPayload | undefined, ctx: ExecutionContext): JwtPayload => {
+  (_data: keyof JwtPayload | undefined, ctx: ExecutionContext): JwtPayload => {
     const request = ctx.switchToHttp().getRequest();
-    return request.user;
+    return _data ? request.user?.[_data] : request.user;
   },
 );
 
 export const GetCompanyId = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext): string => {
+  (_data: unknown, ctx: ExecutionContext): string => {
     const request = ctx.switchToHttp().getRequest();
     return request.user?.companyId;
   },
