@@ -2,19 +2,21 @@
 https://github.com/samuelhfdias-prog/Teste-momesso
 
 ● Breve Explicação da Solução Desenvolvida:
-O projeto "Teste Momesso" é um sistema Full-Stack projetado para o gerenciamento de parques de máquinas agrícolas industriais. A aplicação conta com um painel de controle interativo (Dashboard) desenvolvido em Angular 21, integrado a uma API RESTful ultra-rápida construída com NestJS e TypeORM (utilizando SQLite nativo). 
-A solução entrega segurança robusta através de autenticação JWT com Bcrypt, e possui uma arquitetura Multitenant (Multi-empresas) gerenciada através de regras rigorosas de "roles" (Administradores vs Usuários). O sistema oferece fluxos CRUD completos para gestão de equipamentos, usuários e filiais.
+Este projeto foi desenvolvido como um teste prático para uma vaga de estágio. O objetivo principal foi criar um sistema web de controle e gestão de máquinas agrícolas.
+A aplicação foi dividida em duas partes: o backend feito em NestJS com banco de dados SQLite (usando TypeORM) e o frontend desenvolvido em Angular. Implementei um sistema de login com token JWT e criei diferentes tipos de permissões (Administrador e Usuário), para que cada tipo de conta acesse apenas os dados permitidos. Além disso, fiz telas e rotas para o CRUD (Criar, Ler, Atualizar e Deletar) completo de máquinas, usuários e empresas. 
+Tentei utilizar boas práticas como componentização no Angular, serviços, e injeção de dependência para deixar o código o mais limpo e organizado possível.
 
 ● Instruções Principais de Execução:
-Para rodar a aplicação em seu computador, siga os passos abaixo:
+Para rodar a aplicação no seu computador, siga os passos abaixo:
 
-1. Certifique-se de ter o Node.js (versão 18 ou superior) instalado em sua máquina.
-2. Clone o repositório e acesse a pasta raiz:
+1. Tenha o Node.js instalado (versão 18 ou superior).
+2. Faça o clone do repositório:
    git clone https://github.com/samuelhfdias-prog/Teste-momesso.git
    cd Teste-momesso
-3. Instale todas as dependências automaticamente:
+3. Instale as dependências executando o comando:
    npm install
-4. Inicie o backend e o frontend simultaneamente:
+4. Inicie o servidor e o painel ao mesmo tempo com:
    npm start
 
-A aplicação subirá sozinha e o navegador será aberto automaticamente (Frontend na porta 4200 e Backend na porta 3000). Caso necessite dos dados de demonstração, utilize suporte@momesso.ind.br / 123456.
+O backend vai rodar na porta 3000 e o painel vai abrir no navegador na porta 4200.
+Para testar, você pode usar a conta de suporte criada automaticamente: suporte@momesso.ind.br e a senha 123456.
