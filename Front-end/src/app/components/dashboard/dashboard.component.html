@@ -1,141 +1,140 @@
-<div class="dashboard-container">
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <img src="assets/Logo Momesso.png" alt="Momesso" class="navbar-logo" />
-      <span class="navbar-title">MOMESSO</span>
+<div class="dashboard-shell">
+  <header class="topbar">
+    <a class="brand" href="/dashboard" aria-label="Momesso — início do painel">
+      <img src="assets/Logo Momesso.png" alt="" class="brand-logo" />
+      <span class="brand-divider" aria-hidden="true"></span>
+      <span>Fleet Control</span>
+    </a>
+    <div class="user-menu">
+      <div class="user-meta">
+        <strong>{{ currentUser?.fullName }}</strong>
+        <span>{{
+          currentUser?.role === 'ADMIN' ? 'Administrador geral' : 'Usuário da empresa'
+        }}</span>
+      </div>
+      <span class="avatar" aria-hidden="true">{{ currentUser?.fullName?.charAt(0) || 'M' }}</span>
+      <button class="logout-btn" type="button" (click)="logout()">Sair</button>
     </div>
-    <div class="navbar-user">
-      <span class="user-name">{{ currentUser?.fullName }}</span>
-      <button class="logout-btn" (click)="logout()">Sair</button>
-    </div>
-  </nav>
+  </header>
 
-  <!-- Main Content -->
-  <div class="dashboard-content">
-    <!-- Header -->
-    <div class="dashboard-header">
-      <h1 class="page-title">
-        {{ currentUser?.role === 'ADMIN' ? 'Visão Global do Parque' : 'Parque de Máquinas' }}
-      </h1>
-      <p class="page-subtitle">
-        {{ currentUser?.role === 'ADMIN'
-          ? 'Monitoramento de todas as empresas clientes'
-          : 'Status operacional das suas máquinas'
-        }}
-      </p>
-    </div>
+  <main class="dashboard-content">
+    <section class="welcome" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Centro de operações</p>
+        <h1 id="page-title">
+          {{ currentUser?.role === 'ADMIN' ? 'Visão global do parque' : 'Parque de máquinas' }}
+        </h1>
+        <p>
+          {{
+            currentUser?.role === 'ADMIN'
+              ? 'Indicadores consolidados de todas as empresas clientes.'
+              : 'Acompanhe o estado operacional dos equipamentos da sua empresa.'
+          }}
+        </p>
+      </div>
+      <div class="live-status"><span aria-hidden="true"></span> Dados atualizados pela API</div>
+    </section>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid" *ngIf="stats">
-      <div class="stat-card operational">
-        <div class="stat-icon">⚙️</div>
-        <div class="stat-content">
-          <h3>Operacional</h3>
-          <p class="stat-number">{{ stats.operational }}</p>
+    <div class="notice error" *ngIf="statsError" role="alert">{{ statsError }}</div>
+
+    <section class="stats-grid" aria-label="Indicadores operacionais">
+      <article class="stat-card" [class.loading]="isLoadingStats">
+        <div class="stat-heading">
+          <span class="indicator operational"></span><span>Operacionais</span>
         </div>
-      </div>
-
-      <div class="stat-card maintenance">
-        <div class="stat-icon">🔧</div>
-        <div class="stat-content">
-          <h3>Manutenção</h3>
-          <p class="stat-number">{{ stats.maintenance }}</p>
+        <strong>{{ stats?.operational ?? '—' }}</strong>
+        <small>equipamentos ativos</small>
+      </article>
+      <article class="stat-card" [class.loading]="isLoadingStats">
+        <div class="stat-heading">
+          <span class="indicator maintenance"></span><span>Em manutenção</span>
         </div>
-      </div>
-
-      <div class="stat-card idle">
-        <div class="stat-icon">⏸️</div>
-        <div class="stat-content">
-          <h3>Inativo</h3>
-          <p class="stat-number">{{ stats.idle }}</p>
+        <strong>{{ stats?.maintenance ?? '—' }}</strong>
+        <small>requerem atenção</small>
+      </article>
+      <article class="stat-card" [class.loading]="isLoadingStats">
+        <div class="stat-heading"><span class="indicator idle"></span><span>Em espera</span></div>
+        <strong>{{ stats?.idle ?? '—' }}</strong>
+        <small>temporariamente pausados</small>
+      </article>
+      <article class="stat-card total-card" [class.loading]="isLoadingStats">
+        <div class="stat-heading">
+          <span class="indicator total"></span><span>Total monitorado</span>
         </div>
-      </div>
+        <strong>{{ stats?.total ?? '—' }}</strong>
+        <small>máquinas cadastradas</small>
+      </article>
+    </section>
 
-      <div class="stat-card total">
-        <div class="stat-icon">📊</div>
-        <div class="stat-content">
-          <h3>Total</h3>
-          <p class="stat-number">{{ stats.total }}</p>
+    <section class="overview-grid" aria-label="Resumo do parque">
+      <article class="performance-card">
+        <div>
+          <p class="eyebrow">Eficiência do parque</p>
+          <h2>Operação em tempo real</h2>
+          <p>Uma leitura objetiva da disponibilidade atual dos equipamentos monitorados.</p>
         </div>
-      </div>
-    </div>
-
-    <!-- Industrial Background -->
-    <div class="industrial-section">
-      <div class="industrial-bg">
-        <img 
-          src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=1200&h=400&fit=crop" 
-          alt="Industrial machinery" 
-          class="industrial-image"
-        />
-        <div class="industrial-overlay">
-          <h2>Tecnologia Agrícola de Ponta</h2>
-          <p>Equipamentos Momesso para máxima eficiência no beneficiamento de sementes</p>
+        <div
+          class="gauge"
+          [style.--rate]="operationRate"
+          role="img"
+          [attr.aria-label]="operationRate + '% de taxa de operação'"
+        >
+          <div>
+            <strong>{{ operationRate }}%</strong><span>em operação</span>
+          </div>
         </div>
-      </div>
-    </div>
+      </article>
+      <article class="hours-card">
+        <span class="hours-icon" aria-hidden="true">H</span>
+        <div>
+          <strong>{{ stats?.averageOperatingHours || 0 }}h</strong
+          ><span>Média de horas por máquina</span>
+        </div>
+      </article>
+    </section>
 
-    <!-- Info Cards -->
-    <div class="info-grid">
-      <div class="info-card">
-        <h3>Máquinas Instaladas</h3>
-        <p class="info-number">{{ stats?.total || 0 }}</p>
-        <p class="info-text">Unidades operando em sua rede</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Taxa de Operação</h3>
-        <p class="info-number">{{ operationRate }}%</p>
-        <p class="info-text">Máquinas em funcionamento</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Horas Médias</h3>
-        <p class="info-number">{{ stats?.averageOperatingHours || 0 }}h</p>
-        <p class="info-text">Tempo médio de operação</p>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <button 
-        class="btn" 
-        [class.btn-primary]="activeTab === 'maquinas'"
-        [class.btn-secondary]="activeTab !== 'maquinas'"
-        (click)="setTab('maquinas')">
-        📋 Ver Máquinas
-      </button>
-      <button 
-        class="btn" 
-        [class.btn-primary]="activeTab === 'usuarios'"
-        [class.btn-secondary]="activeTab !== 'usuarios'"
-        (click)="setTab('usuarios')">
-        👥 Gerenciar Usuários
-      </button>
-      <button 
-        class="btn" 
-        [class.btn-primary]="activeTab === 'empresas'"
-        [class.btn-secondary]="activeTab !== 'empresas'"
-        *ngIf="currentUser?.role === 'ADMIN'"
-        (click)="setTab('empresas')">
-        🏢 Empresas
-      </button>
-    </div>
-
-    <!-- Tab Content -->
-    <div class="tab-content">
-      <div *ngIf="activeTab === 'maquinas'" class="tab-pane fade-in">
-        <app-machines-crud></app-machines-crud>
+    <section class="workspace" aria-labelledby="workspace-title">
+      <div class="workspace-header">
+        <div>
+          <p class="eyebrow">Gestão</p>
+          <h2 id="workspace-title">Cadastros do sistema</h2>
+        </div>
+        <nav class="tabs" aria-label="Módulos de cadastro">
+          <button
+            type="button"
+            [class.active]="activeTab === 'maquinas'"
+            (click)="setTab('maquinas')"
+          >
+            Máquinas
+          </button>
+          <button
+            type="button"
+            [class.active]="activeTab === 'usuarios'"
+            (click)="setTab('usuarios')"
+          >
+            Usuários
+          </button>
+          <button
+            type="button"
+            [class.active]="activeTab === 'empresas'"
+            *ngIf="currentUser?.role === 'ADMIN'"
+            (click)="setTab('empresas')"
+          >
+            Empresas
+          </button>
+        </nav>
       </div>
 
-      <div *ngIf="activeTab === 'usuarios'" class="tab-pane fade-in">
-        <app-users-crud></app-users-crud>
+      <div class="tab-content">
+        <app-machines-crud
+          *ngIf="activeTab === 'maquinas'"
+          (changed)="loadStats()"
+        ></app-machines-crud>
+        <app-users-crud *ngIf="activeTab === 'usuarios'"></app-users-crud>
+        <app-companies-crud
+          *ngIf="activeTab === 'empresas' && currentUser?.role === 'ADMIN'"
+        ></app-companies-crud>
       </div>
-
-      <div *ngIf="activeTab === 'empresas'" class="tab-pane fade-in">
-        <app-companies-crud></app-companies-crud>
-      </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </div>

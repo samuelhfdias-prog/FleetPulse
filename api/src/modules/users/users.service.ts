@@ -1,41 +1,56 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User, UserRole } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { JwtPayload } from '@/common/decorators/get-user.decorator';
+import { JwtPayload } from '../../common/decorators/get-user.decorator';
 import * as bcrypt from 'bcryptjs';
+import { Company } from '../companies/company.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Company)
+    private companiesRepository: Repository<Company>,
   ) {}
 
   async create(createUserDto: CreateUserDto, user: JwtPayload): Promise<User> {
-    // Apenas ADMINs podem criar usuários ou USERs podem criar na sua company
     if (user.role === 'USER' && user.companyId !== createUserDto.companyId) {
       throw new ForbiddenException('Você não tem permissão para criar usuários em outra empresa');
     }
 
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const [existingUser, company] = await Promise.all([
+      this.usersRepository.findOne({ where: { email: createUserDto.email } }),
+      this.companiesRepository.findOne({ where: { id: createUserDto.companyId, isActive: true } }),
+    ]);
+    if (existingUser) throw new ConflictException('Email já cadastrado');
+    if (!company) throw new NotFoundException('Empresa ativa não encontrada');
+
+    const { password, role, ...userData } = createUserDto;
+    const hashedPassword = await bcrypt.hash(password, 12);
     const newUser = this.usersRepository.create({
-      ...createUserDto,
+      ...userData,
       passwordHash: hashedPassword,
+      role: user.role === 'ADMIN' ? role || UserRole.USER : UserRole.USER,
     });
 
     return await this.usersRepository.save(newUser);
   }
 
   async findAll(user: JwtPayload): Promise<User[]> {
-    if (user.role === 'ADMIN') {
-      return await this.usersRepository.find();
-    } else {
-      return await this.usersRepository.find({
-        where: { companyId: user.companyId },
-      });
-    }
+    return user.role === 'ADMIN'
+      ? this.usersRepository.find({ order: { fullName: 'ASC' } })
+      : this.usersRepository.find({
+          where: { companyId: user.companyId },
+          order: { fullName: 'ASC' },
+        });
   }
 
   async findOne(id: string, user: JwtPayload): Promise<User> {
@@ -56,20 +71,28 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto, user: JwtPayload): Promise<User> {
     const targetUser = await this.findOne(id, user);
-
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    if (user.role !== 'ADMIN' && user.sub !== targetUser.id) {
+      throw new ForbiddenException('Você só pode alterar o seu próprio perfil');
     }
 
-    Object.assign(targetUser, {
-      ...updateUserDto,
-      ...(updateUserDto.password && { passwordHash: updateUserDto.password }),
-    });
+    const { password, role, ...safeUpdates } = updateUserDto;
+    Object.assign(targetUser, safeUpdates);
+
+    if (password) {
+      targetUser.passwordHash = await bcrypt.hash(password, 12);
+    }
+    if (role && user.role === 'ADMIN') targetUser.role = role;
 
     return await this.usersRepository.save(targetUser);
   }
 
   async remove(id: string, user: JwtPayload): Promise<void> {
+    if (user.role !== 'ADMIN') {
+      throw new ForbiddenException('Apenas administradores podem excluir usuários');
+    }
+    if (id === user.sub) {
+      throw new ForbiddenException('Não é possível excluir o próprio usuário autenticado');
+    }
     const targetUser = await this.findOne(id, user);
     await this.usersRepository.remove(targetUser);
   }

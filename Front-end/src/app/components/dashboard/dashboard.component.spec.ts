@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { of } from 'rxjs';
 
 import { DashboardComponent } from './dashboard.component';
+import { AuthService } from '../../services/auth.service';
+import { MachinesService } from '../../services/machines.service';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -10,13 +11,27 @@ describe('DashboardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DashboardComponent ],
-      imports: [ 
-        HttpClientTestingModule,
-        RouterTestingModule 
-      ]
+      imports: [DashboardComponent],
+      providers: [
+        { provide: AuthService, useValue: { getCurrentUser: () => null, logout: () => undefined } },
+        {
+          provide: MachinesService,
+          useValue: {
+            getStatistics: () =>
+              of({
+                total: 0,
+                operational: 0,
+                maintenance: 0,
+                idle: 0,
+                inactive: 0,
+                averageOperatingHours: 0,
+              }),
+          },
+        },
+      ],
     })
-    .compileComponents();
+      .overrideComponent(DashboardComponent, { set: { template: '' } })
+      .compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;

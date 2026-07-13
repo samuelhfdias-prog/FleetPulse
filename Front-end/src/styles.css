@@ -17,13 +17,13 @@
   --color-error: #dc2626;
   --color-warning: #f59e0b;
   --color-info: #3b82f6;
-  
-  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  --font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --border-radius: 8px;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.15);
   --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.2);
-  
+
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
@@ -31,10 +31,31 @@
 
 html,
 body {
+  min-height: 100%;
   font-family: var(--font-family);
   color: var(--color-secondary);
   background-color: var(--color-gray-light);
   line-height: 1.6;
+}
+
+body {
+  min-width: 320px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(34, 197, 94, 0.28);
+  outline-offset: 2px;
 }
 
 /* Typography */
@@ -82,6 +103,17 @@ button {
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Inputs */

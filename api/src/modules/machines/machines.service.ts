@@ -1,22 +1,47 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Machine } from './machine.entity';
+import { Machine, MachineStatus } from './machine.entity';
 import { CreateMachineDto, UpdateMachineDto } from './dto/machine.dto';
-import { JwtPayload } from '@/common/decorators/get-user.decorator';
+import { JwtPayload } from '../../common/decorators/get-user.decorator';
+import { Company } from '../companies/company.entity';
+
+export interface MachineStatistics {
+  total: number;
+  operational: number;
+  maintenance: number;
+  idle: number;
+  inactive: number;
+  averageOperatingHours: number;
+}
 
 @Injectable()
 export class MachinesService {
   constructor(
     @InjectRepository(Machine)
     private machinesRepository: Repository<Machine>,
+    @InjectRepository(Company)
+    private companiesRepository: Repository<Company>,
   ) {}
 
   async create(createMachineDto: CreateMachineDto, user: JwtPayload): Promise<Machine> {
-    // Apenas ADMINs ou USERs da sua company podem criar máquinas
     if (user.role === 'USER' && user.companyId !== createMachineDto.companyId) {
       throw new ForbiddenException('Você não tem permissão para criar máquinas em outra empresa');
     }
+
+    const [duplicate, company] = await Promise.all([
+      this.machinesRepository.findOne({ where: { serialNumber: createMachineDto.serialNumber } }),
+      this.companiesRepository.findOne({
+        where: { id: createMachineDto.companyId, isActive: true },
+      }),
+    ]);
+    if (duplicate) throw new ConflictException('Número de série já cadastrado');
+    if (!company) throw new NotFoundException('Empresa ativa não encontrada');
 
     const machine = this.machinesRepository.create(createMachineDto);
     return await this.machinesRepository.save(machine);
@@ -26,11 +51,13 @@ export class MachinesService {
     if (user.role === 'ADMIN') {
       return await this.machinesRepository.find({
         relations: ['company'],
+        order: { name: 'ASC' },
       });
     } else {
       return await this.machinesRepository.find({
         where: { companyId: user.companyId },
         relations: ['company'],
+        order: { name: 'ASC' },
       });
     }
   }
@@ -75,7 +102,7 @@ export class MachinesService {
   }
 
   // Dashboard statistics
-  async getStatistics(user: JwtPayload): Promise<any> {
+  async getStatistics(user: JwtPayload): Promise<MachineStatistics> {
     let machines;
 
     if (user.role === 'ADMIN') {
@@ -86,10 +113,10 @@ export class MachinesService {
       });
     }
 
-    const operational = machines.filter((m) => m.status === 'OPERATIONAL').length;
-    const maintenance = machines.filter((m) => m.status === 'MAINTENANCE').length;
-    const idle = machines.filter((m) => m.status === 'IDLE').length;
-    const inactive = machines.filter((m) => m.status === 'INACTIVE').length;
+    const operational = machines.filter((m) => m.status === MachineStatus.OPERATIONAL).length;
+    const maintenance = machines.filter((m) => m.status === MachineStatus.MAINTENANCE).length;
+    const idle = machines.filter((m) => m.status === MachineStatus.IDLE).length;
+    const inactive = machines.filter((m) => m.status === MachineStatus.INACTIVE).length;
 
     const totalOperatingHours = machines.reduce((sum, m) => sum + m.operatingHours, 0);
 
@@ -99,7 +126,8 @@ export class MachinesService {
       maintenance,
       idle,
       inactive,
-      averageOperatingHours: machines.length > 0 ? Math.round(totalOperatingHours / machines.length) : 0,
+      averageOperatingHours:
+        machines.length > 0 ? Math.round(totalOperatingHours / machines.length) : 0,
     };
   }
 }

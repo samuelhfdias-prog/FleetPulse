@@ -1,8 +1,8 @@
 // Ambiente de Development - Angular
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
+  apiUrl: '/api',
   apiTimeout: 30000,
-  tokenStorageKey: 'momesso_token',
-  userStorageKey: 'momesso_user',
+  tokenStorageKey: 'momesso.token',
+  userStorageKey: 'momesso.user',
 };

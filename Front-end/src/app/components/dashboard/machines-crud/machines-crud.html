@@ -1,103 +1,160 @@
 <div class="crud-container">
   <div class="crud-header">
-    <h2>Gerenciamento de Máquinas</h2>
-    <button class="btn btn-primary" (click)="openForm()" *ngIf="!showForm">
-      + Nova Máquina
+    <div>
+      <h3>Máquinas</h3>
+      <p>Inventário e estado operacional dos equipamentos.</p>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="openForm()" *ngIf="!showForm">
+      + Nova máquina
     </button>
   </div>
 
-  <!-- Formulário (Adicionar / Editar) -->
-  <div class="crud-form-container fade-in" *ngIf="showForm">
-    <h3>{{ isEditing ? 'Editar Máquina' : 'Cadastrar Nova Máquina' }}</h3>
-    
-    <form [formGroup]="machineForm" (ngSubmit)="onSubmit()" class="crud-form">
+  <div class="form-notice error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
+
+  <section class="crud-form-container" *ngIf="showForm" aria-labelledby="machine-form-title">
+    <div class="form-title">
+      <h3 id="machine-form-title">{{ isEditing ? 'Editar máquina' : 'Cadastrar máquina' }}</h3>
+      <p>Campos com * são obrigatórios.</p>
+    </div>
+    <form [formGroup]="machineForm" (ngSubmit)="onSubmit()" class="crud-form" novalidate>
       <div class="form-row">
         <div class="form-group">
-          <label>Nome do Equipamento</label>
-          <input type="text" formControlName="name" placeholder="Ex: Separadora S200">
+          <label for="machine-name">Nome *</label
+          ><input
+            id="machine-name"
+            type="text"
+            formControlName="name"
+            placeholder="Separadora S200"
+          />
         </div>
         <div class="form-group">
-          <label>Modelo</label>
-          <input type="text" formControlName="model" placeholder="Ex: S200-Pro">
+          <label for="machine-model">Modelo *</label
+          ><input id="machine-model" type="text" formControlName="model" placeholder="S200-Pro" />
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
-          <label>Número de Série</label>
-          <input type="text" formControlName="serialNumber" placeholder="Ex: 9999-XXXX">
+          <label for="machine-serial">Número de série *</label
+          ><input
+            id="machine-serial"
+            type="text"
+            formControlName="serialNumber"
+            placeholder="S200-2026-0001"
+          />
         </div>
         <div class="form-group">
-          <label>Tipo de Equipamento</label>
-          <input type="text" formControlName="equipmentType" placeholder="Ex: Tratamento">
+          <label for="machine-type">Tipo de equipamento *</label
+          ><input
+            id="machine-type"
+            type="text"
+            formControlName="equipmentType"
+            placeholder="Tratamento de sementes"
+          />
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
-          <label>Status Atual</label>
-          <select formControlName="status">
-            <option value="OPERATIONAL">Operacional</option>
-            <option value="MAINTENANCE">Manutenção</option>
-            <option value="IDLE">Inativo (Pausado)</option>
-            <option value="INACTIVE">Desativado</option>
+          <label for="machine-company">Empresa *</label>
+          <select id="machine-company" formControlName="companyId">
+            <option value="">Selecione</option>
+            <option *ngFor="let company of companies" [value]="company.id">
+              {{ company.name }}
+            </option>
           </select>
         </div>
         <div class="form-group">
-          <label>Localização / Unidade</label>
-          <input type="text" formControlName="location" placeholder="Ex: Galpão Central">
+          <label for="machine-status">Status *</label>
+          <select id="machine-status" formControlName="status">
+            <option value="OPERATIONAL">Operacional</option>
+            <option value="MAINTENANCE">Em manutenção</option>
+            <option value="IDLE">Em espera</option>
+            <option value="INACTIVE">Desativada</option>
+          </select>
         </div>
       </div>
-
+      <div class="form-row">
+        <div class="form-group">
+          <label for="machine-location">Localização</label
+          ><input
+            id="machine-location"
+            type="text"
+            formControlName="location"
+            placeholder="Galpão central"
+          />
+        </div>
+        <div class="form-group">
+          <label for="machine-hours">Horas de operação *</label
+          ><input
+            id="machine-hours"
+            type="number"
+            min="0"
+            step="1"
+            formControlName="operatingHours"
+          />
+        </div>
+      </div>
       <div class="form-actions">
         <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancelar</button>
-        <button type="submit" class="btn btn-primary" [disabled]="machineForm.invalid || loading">
-          {{ loading ? 'Salvando...' : 'Salvar Máquina' }}
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          {{ loading ? 'Salvando…' : 'Salvar máquina' }}
         </button>
       </div>
     </form>
-  </div>
+  </section>
 
-  <!-- Tabela de Listagem -->
   <div class="table-container" *ngIf="!showForm">
-    <div class="loading-state" *ngIf="loading">
-      Carregando máquinas...
-    </div>
-
+    <div class="loading-state" *ngIf="loading" aria-live="polite">Carregando máquinas…</div>
     <table class="crud-table" *ngIf="!loading">
       <thead>
         <tr>
           <th>Equipamento</th>
-          <th>Modelo</th>
+          <th>Empresa</th>
           <th>Série</th>
           <th>Status</th>
-          <th>Horas/Op</th>
+          <th>Horas</th>
           <th class="actions-col">Ações</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let m of machines">
+        <tr *ngFor="let machine of machines">
           <td class="primary-col">
-            <span class="m-name">{{ m.name }}</span>
-            <span class="m-type">{{ m.equipmentType }}</span>
+            <strong>{{ machine.name }}</strong
+            ><span>{{ machine.model }} · {{ machine.equipmentType }}</span>
           </td>
-          <td>{{ m.model }}</td>
-          <td>{{ m.serialNumber }}</td>
+          <td>{{ getCompanyName(machine.companyId) }}</td>
+          <td class="serial-col">{{ machine.serialNumber }}</td>
           <td>
-            <span class="status-badge" [ngClass]="getStatusClass(m.status)">
-              {{ m.status }}
-            </span>
+            <span class="status-badge" [ngClass]="getStatusClass(machine.status)">{{
+              machine.status === 'OPERATIONAL'
+                ? 'Operacional'
+                : machine.status === 'MAINTENANCE'
+                  ? 'Manutenção'
+                  : machine.status === 'IDLE'
+                    ? 'Em espera'
+                    : 'Desativada'
+            }}</span>
           </td>
-          <td>{{ m.operatingHours }}h</td>
+          <td>{{ machine.operatingHours }}h</td>
           <td class="actions-col">
-            <button class="btn-icon btn-edit" (click)="openForm(m)" title="Editar">✏️</button>
-            <button class="btn-icon btn-delete" (click)="deleteMachine(m.id)" title="Excluir">🗑️</button>
+            <button
+              type="button"
+              class="btn-icon"
+              (click)="openForm(machine)"
+              [attr.aria-label]="'Editar ' + machine.name"
+            >
+              Editar</button
+            ><button
+              type="button"
+              class="btn-icon danger"
+              (click)="deleteMachine(machine.id)"
+              [attr.aria-label]="'Excluir ' + machine.name"
+            >
+              Excluir
+            </button>
           </td>
         </tr>
         <tr *ngIf="machines.length === 0">
-          <td colspan="6" class="empty-table">
-            Nenhuma máquina encontrada no sistema.
-          </td>
+          <td colspan="6" class="empty-table">Nenhuma máquina cadastrada.</td>
         </tr>
       </tbody>
     </table>

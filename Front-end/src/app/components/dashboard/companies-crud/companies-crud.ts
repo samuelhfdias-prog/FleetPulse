@@ -21,6 +21,7 @@ export class CompaniesCrud implements OnInit {
   isEditing = false;
   currentCompanyId: string | null = null;
   loading = false;
+  errorMessage = '';
 
   constructor() {
     this.companyForm = this.fb.group({
@@ -31,7 +32,7 @@ export class CompaniesCrud implements OnInit {
       contactPhone: [''],
       city: [''],
       state: [''],
-      isActive: [true]
+      isActive: [true],
     });
   }
 
@@ -41,15 +42,16 @@ export class CompaniesCrud implements OnInit {
 
   loadCompanies(): void {
     this.loading = true;
+    this.errorMessage = '';
     this.companiesService.getCompanies().subscribe({
       next: (data: Company[]) => {
         this.companies = data;
         this.loading = false;
       },
-      error: (err: any) => {
-        console.error('Erro ao carregar empresas', err);
+      error: () => {
+        this.errorMessage = 'Não foi possível carregar as empresas.';
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -68,14 +70,24 @@ export class CompaniesCrud implements OnInit {
 
   closeForm(): void {
     this.showForm = false;
-    this.companyForm.reset();
+    this.errorMessage = '';
   }
 
   onSubmit(): void {
-    if (this.companyForm.invalid) return;
+    if (this.companyForm.invalid) {
+      this.companyForm.markAllAsTouched();
+      return;
+    }
 
     this.loading = true;
-    const formData = this.companyForm.value;
+    this.errorMessage = '';
+    const raw = this.companyForm.value;
+    const formData = {
+      ...raw,
+      contactPhone: raw.contactPhone || undefined,
+      city: raw.city || undefined,
+      state: raw.state || undefined,
+    };
 
     if (this.isEditing && this.currentCompanyId) {
       this.companiesService.updateCompany(this.currentCompanyId, formData).subscribe({
@@ -83,10 +95,10 @@ export class CompaniesCrud implements OnInit {
           this.loadCompanies();
           this.closeForm();
         },
-        error: (err: any) => {
-          console.error('Erro ao atualizar empresa', err);
+        error: (err: { error?: { message?: string | string[] } }) => {
+          this.errorMessage = this.getErrorMessage(err, 'Não foi possível atualizar a empresa.');
           this.loading = false;
-        }
+        },
       });
     } else {
       this.companiesService.createCompany(formData).subscribe({
@@ -94,24 +106,36 @@ export class CompaniesCrud implements OnInit {
           this.loadCompanies();
           this.closeForm();
         },
-        error: (err: any) => {
-          console.error('Erro ao criar empresa', err);
+        error: (err: { error?: { message?: string | string[] } }) => {
+          this.errorMessage = this.getErrorMessage(err, 'Não foi possível criar a empresa.');
           this.loading = false;
-        }
+        },
       });
     }
   }
 
   deleteCompany(id: string): void {
-    if (confirm('Atenção: Excluir uma empresa removerá todas as máquinas e usuários associados. Tem certeza?')) {
+    if (
+      confirm(
+        'Atenção: Excluir uma empresa removerá todas as máquinas e usuários associados. Tem certeza?',
+      )
+    ) {
       this.loading = true;
       this.companiesService.deleteCompany(id).subscribe({
         next: () => this.loadCompanies(),
-        error: (err: any) => {
-          console.error('Erro ao excluir empresa', err);
+        error: (err: { error?: { message?: string | string[] } }) => {
+          this.errorMessage = this.getErrorMessage(err, 'Não foi possível excluir a empresa.');
           this.loading = false;
-        }
+        },
       });
     }
+  }
+
+  private getErrorMessage(
+    error: { error?: { message?: string | string[] } },
+    fallback: string,
+  ): string {
+    const message = error.error?.message;
+    return Array.isArray(message) ? message.join(' ') : message || fallback;
   }
 }

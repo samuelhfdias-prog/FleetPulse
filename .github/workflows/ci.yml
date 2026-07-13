@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            api/package-lock.json
+            Front-end/package-lock.json
+      - name: Install dependencies
+        run: npm run install:all
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+      - name: Audit production dependencies
+        run: npm run audit:prod

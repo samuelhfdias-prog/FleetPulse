@@ -4,14 +4,17 @@
   "description": "Sistema de Gerenciamento de Parque de Máquinas - Agrícolas Industriais",
   "private": true,
   "scripts": {
-    "install:all": "npm install && cd api && npm install && cd ../Front-end && npm install",
+    "install:all": "npm ci && npm --prefix api ci && npm --prefix Front-end ci",
     "start": "concurrently \"npm run start:api\" \"npm run start:web\"",
-    "start:api": "cd api && npm run build && npm run start:prod",
-    "start:web": "cd Front-end && npm start",
-    "build:api": "cd api && npm run build",
-    "build:web": "cd Front-end && npm run build",
-    "test:api": "cd api && npm test",
-    "test:web": "cd Front-end && npm test"
+    "start:api": "npm --prefix api run start:dev",
+    "start:web": "npm --prefix Front-end start",
+    "build": "npm run build:api && npm run build:web",
+    "build:api": "npm --prefix api run build",
+    "build:web": "npm --prefix Front-end run build",
+    "test": "npm run test:api && npm run test:web",
+    "test:api": "npm --prefix api test -- --runInBand --passWithNoTests",
+    "test:web": "npm --prefix Front-end test",
+    "audit:prod": "npm --prefix api audit --omit=dev && npm --prefix Front-end audit --omit=dev"
   },
   "keywords": [
     "nestjs",

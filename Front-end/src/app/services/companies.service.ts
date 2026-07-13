@@ -3,13 +3,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Company } from '../models/data.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CompaniesService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/companies';
+  private apiUrl = `${environment.apiUrl}/companies`;
 
   getCompanies(): Observable<Company[]> {
     return this.http.get<Company[]>(this.apiUrl);

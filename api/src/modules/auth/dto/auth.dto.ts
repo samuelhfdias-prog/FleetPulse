@@ -1,13 +1,16 @@
+import { Transform } from 'class-transformer';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 import { UserRole } from '../../users/user.entity';
-
-import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class LoginDto {
   @IsEmail()
+  @MaxLength(255)
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
   email: string;
 
-  @IsNotEmpty()
   @IsString()
+  @MinLength(6)
+  @MaxLength(128)
   password: string;
 }
 
@@ -17,27 +20,7 @@ export class AuthResponseDto {
     id: string;
     email: string;
     fullName: string;
-    role: string;
+    role: UserRole;
     companyId: string;
   };
-}
-
-export class CreateUserDto {
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  password: string;
-
-  @IsNotEmpty()
-  @IsString()
-  fullName: string;
-
-  @IsNotEmpty()
-  @IsString()
-  companyId: string;
-
-  @IsOptional()
-  role?: UserRole;
 }

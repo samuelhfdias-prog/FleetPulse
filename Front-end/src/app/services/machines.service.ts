@@ -2,19 +2,21 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Machine {
   id: string;
+  companyId: string;
   name: string;
   model: string;
   serialNumber: string;
   equipmentType: string;
   status: 'OPERATIONAL' | 'MAINTENANCE' | 'IDLE' | 'INACTIVE';
-  location: string;
+  location?: string;
   operatingHours: number;
-  lastMaintenance: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  lastMaintenance?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface MachineStats {
@@ -31,7 +33,7 @@ export interface MachineStats {
 })
 export class MachinesService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/machines';
+  private apiUrl = `${environment.apiUrl}/machines`;
 
   getMachines(): Observable<Machine[]> {
     return this.http.get<Machine[]>(this.apiUrl);

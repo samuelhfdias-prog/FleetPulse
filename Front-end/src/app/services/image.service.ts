@@ -58,8 +58,4 @@ export class ImageService {
   getImageUrl(imageName: string): string {
     return `/assets/images/${imageName}`;
   }
-
-  getExternalImageUrl(unsplashId: string, width = 1200, height = 600): string {
-    return `https://images.unsplash.com/${unsplashId}?w=${width}&h=${height}&fit=crop`;
-  }
 }

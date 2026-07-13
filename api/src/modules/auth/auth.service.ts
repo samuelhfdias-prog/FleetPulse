@@ -1,11 +1,12 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { User, UserRole } from '../users/user.entity';
-import { LoginDto, CreateUserDto, AuthResponseDto } from './dto/auth.dto';
-import { JwtPayload } from '@/common/decorators/get-user.decorator';
+import { User } from '../users/user.entity';
+import { LoginDto, AuthResponseDto } from './dto/auth.dto';
+import { JwtPayload } from '../../common/decorators/get-user.decorator';
 
 @Injectable()
 export class AuthService {
@@ -13,12 +14,15 @@ export class AuthService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private jwtService: JwtService,
+    private config: ConfigService,
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
-    const user = await this.usersRepository.findOne({
-      where: { email: loginDto.email },
-    });
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('LOWER(user.email) = LOWER(:email)', { email: loginDto.email })
+      .getOne();
 
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Email ou senha inválidos');
@@ -37,49 +41,7 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: parseInt(process.env.JWT_EXPIRATION || '3600', 10),
-    });
-
-    return {
-      accessToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role,
-        companyId: user.companyId,
-      },
-    };
-  }
-
-  async register(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
-    const existingUser = await this.usersRepository.findOne({
-      where: { email: createUserDto.email },
-    });
-
-    if (existingUser) {
-      throw new BadRequestException('Email já cadastrado');
-    }
-
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-    const user = this.usersRepository.create({
-      ...createUserDto,
-      passwordHash: hashedPassword,
-      role: createUserDto.role || UserRole.USER,
-    });
-
-    await this.usersRepository.save(user);
-
-    const payload: JwtPayload = {
-      sub: user.id,
-      email: user.email,
-      companyId: user.companyId,
-      role: user.role,
-    };
-
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: parseInt(process.env.JWT_EXPIRATION || '3600', 10),
+      expiresIn: this.config.getOrThrow<number>('JWT_EXPIRATION'),
     });
 
     return {
@@ -95,11 +57,13 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.usersRepository.findOne({
-      where: { email },
-    });
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('LOWER(user.email) = LOWER(:email)', { email })
+      .getOne();
 
-    if (!user) {
+    if (!user || !user.isActive) {
       return null;
     }
 

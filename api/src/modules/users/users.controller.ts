@@ -1,10 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
-import { GetUser } from '@/common/decorators/get-user.decorator';
-import { JwtPayload } from '@/common/decorators/get-user.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { GetUser, JwtPayload } from '../../common/decorators/get-user.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -22,17 +31,21 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @GetUser() user: JwtPayload): Promise<User> {
+  findOne(@Param('id', ParseUUIDPipe) id: string, @GetUser() user: JwtPayload): Promise<User> {
     return this.usersService.findOne(id, user);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @GetUser() user: JwtPayload): Promise<User> {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @GetUser() user: JwtPayload,
+  ): Promise<User> {
     return this.usersService.update(id, updateUserDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @GetUser() user: JwtPayload): Promise<void> {
+  remove(@Param('id', ParseUUIDPipe) id: string, @GetUser() user: JwtPayload): Promise<void> {
     return this.usersService.remove(id, user);
   }
 }

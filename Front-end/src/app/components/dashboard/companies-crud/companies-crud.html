@@ -1,66 +1,73 @@
 <div class="crud-container">
   <div class="crud-header">
-    <h2>Gestão de Empresas Clientes</h2>
-    <button class="btn btn-primary" (click)="openForm()" *ngIf="!showForm">
-      + Cadastrar Empresa
+    <div>
+      <h3>Empresas</h3>
+      <p>Clientes e unidades vinculadas ao parque.</p>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="openForm()" *ngIf="!showForm">
+      + Nova empresa
     </button>
   </div>
-
-  <div class="crud-form-container fade-in" *ngIf="showForm">
-    <h3>{{ isEditing ? 'Editar Empresa' : 'Cadastrar Nova Empresa' }}</h3>
-    
-    <form [formGroup]="companyForm" (ngSubmit)="onSubmit()" class="crud-form">
+  <div class="form-notice error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
+  <section class="crud-form-container" *ngIf="showForm" aria-labelledby="company-form-title">
+    <div class="form-title">
+      <h3 id="company-form-title">{{ isEditing ? 'Editar empresa' : 'Cadastrar empresa' }}</h3>
+      <p>Campos com * são obrigatórios.</p>
+    </div>
+    <form [formGroup]="companyForm" (ngSubmit)="onSubmit()" class="crud-form" novalidate>
       <div class="form-row">
         <div class="form-group">
-          <label>Nome / Razão Social</label>
-          <input type="text" formControlName="name" placeholder="Ex: Agroforte S/A">
+          <label for="company-name">Razão social *</label
+          ><input id="company-name" type="text" formControlName="name" />
         </div>
         <div class="form-group">
-          <label>Documento (CNPJ/CPF)</label>
-          <input type="text" formControlName="document" placeholder="Ex: 00.000.000/0001-00">
+          <label for="company-document">CNPJ/CPF *</label
+          ><input
+            id="company-document"
+            type="text"
+            formControlName="document"
+            inputmode="numeric"
+          />
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
-          <label>Setor de Atuação</label>
-          <input type="text" formControlName="industry" placeholder="Ex: Agronegócio">
+          <label for="company-industry">Setor *</label
+          ><input id="company-industry" type="text" formControlName="industry" />
         </div>
         <div class="form-group">
-          <label>Email de Contato</label>
-          <input type="email" formControlName="contactEmail" placeholder="Ex: contato@empresa.com.br">
+          <label for="company-email">E-mail *</label
+          ><input id="company-email" type="email" formControlName="contactEmail" />
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
-          <label>Cidade</label>
-          <input type="text" formControlName="city" placeholder="Ex: Ribeirão Preto">
+          <label for="company-phone">Telefone</label
+          ><input id="company-phone" type="tel" formControlName="contactPhone" />
         </div>
         <div class="form-group">
-          <label>Estado (UF)</label>
-          <input type="text" formControlName="state" placeholder="Ex: SP">
+          <label for="company-city">Cidade</label
+          ><input id="company-city" type="text" formControlName="city" />
+        </div>
+        <div class="form-group small-field">
+          <label for="company-state">UF</label
+          ><input id="company-state" type="text" maxlength="2" formControlName="state" />
         </div>
       </div>
-
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancelar</button>
-        <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid || loading">
-          {{ loading ? 'Salvando...' : 'Salvar Empresa' }}
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancelar</button
+        ><button type="submit" class="btn btn-primary" [disabled]="loading">
+          {{ loading ? 'Salvando…' : 'Salvar empresa' }}
         </button>
       </div>
     </form>
-  </div>
-
+  </section>
   <div class="table-container" *ngIf="!showForm">
-    <div class="loading-state" *ngIf="loading">
-      Carregando empresas...
-    </div>
-
+    <div class="loading-state" *ngIf="loading">Carregando empresas…</div>
     <table class="crud-table" *ngIf="!loading">
       <thead>
         <tr>
-          <th>Razão Social</th>
+          <th>Empresa</th>
           <th>Documento</th>
           <th>Setor</th>
           <th>Localidade</th>
@@ -68,23 +75,25 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let c of companies">
+        <tr *ngFor="let company of companies">
           <td class="primary-col">
-            <span class="m-name">{{ c.name }}</span>
-            <span class="m-type">{{ c.contactEmail }}</span>
+            <strong>{{ company.name }}</strong
+            ><span>{{ company.contactEmail || 'Sem e-mail' }}</span>
           </td>
-          <td>{{ c.document }}</td>
-          <td>{{ c.industry }}</td>
-          <td>{{ c.city ? c.city + ' - ' + c.state : 'N/A' }}</td>
+          <td>{{ company.document }}</td>
+          <td>{{ company.industry }}</td>
+          <td>
+            {{ company.city ? company.city + (company.state ? ' · ' + company.state : '') : '—' }}
+          </td>
           <td class="actions-col">
-            <button class="btn-icon btn-edit" (click)="openForm(c)" title="Editar">✏️</button>
-            <button class="btn-icon btn-delete" (click)="deleteCompany(c.id)" title="Excluir">🗑️</button>
+            <button type="button" class="btn-icon" (click)="openForm(company)">Editar</button
+            ><button type="button" class="btn-icon danger" (click)="deleteCompany(company.id)">
+              Excluir
+            </button>
           </td>
         </tr>
         <tr *ngIf="companies.length === 0">
-          <td colspan="5" class="empty-table">
-            Nenhuma empresa cadastrada.
-          </td>
+          <td colspan="5" class="empty-table">Nenhuma empresa cadastrada.</td>
         </tr>
       </tbody>
     </table>

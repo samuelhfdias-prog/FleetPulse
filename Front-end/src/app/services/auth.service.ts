@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface User {
   id: string;
@@ -24,10 +25,10 @@ export interface AuthResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  
-  private apiUrl = 'http://localhost:3000/api/auth';
+
+  private apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
-  
+
   currentUser$ = this.currentUserSubject.asObservable();
 
   login(email: string, password: string): Observable<AuthResponse> {
@@ -41,27 +42,59 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem(environment.tokenStorageKey);
+    sessionStorage.removeItem(environment.userStorageKey);
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    void this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    const token = this.getToken();
+    if (!token || !this.getUserFromStorage()) return false;
+
+    try {
+      const segment = token.split('.')[1];
+      const normalized = segment.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+      const payload = JSON.parse(atob(padded));
+      const isValid = typeof payload.exp === 'number' && payload.exp * 1000 > Date.now();
+      if (!isValid) this.clearAuthData();
+      return isValid;
+    } catch {
+      this.clearAuthData();
+      return false;
+    }
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem(environment.tokenStorageKey);
+  }
+
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
   }
 
   private setAuthData(user: User, token: string): void {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    sessionStorage.setItem(environment.tokenStorageKey, token);
+    sessionStorage.setItem(environment.userStorageKey, JSON.stringify(user));
   }
 
   private getUserFromStorage(): User | null {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    const userStr = sessionStorage.getItem(environment.userStorageKey);
+    if (!userStr) return null;
+    try {
+      const user = JSON.parse(userStr) as User;
+      return user?.id && user?.email ? user : null;
+    } catch {
+      sessionStorage.removeItem(environment.tokenStorageKey);
+      sessionStorage.removeItem(environment.userStorageKey);
+      return null;
+    }
+  }
+
+  private clearAuthData(): void {
+    sessionStorage.removeItem(environment.tokenStorageKey);
+    sessionStorage.removeItem(environment.userStorageKey);
+    this.currentUserSubject.next(null);
   }
 }
