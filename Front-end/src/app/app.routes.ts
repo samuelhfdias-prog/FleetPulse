@@ -9,13 +9,13 @@ export const routes: Routes = [
     path: 'login',
     component: LoginComponent,
     canActivate: [guestGuard],
-    title: 'Acesso | Momesso',
+    title: 'Acesso | FleetPulse',
   },
   {
     path: 'dashboard',
     component: DashboardComponent,
     canActivate: [authGuard],
-    title: 'Painel | Momesso',
+    title: 'Painel | FleetPulse',
   },
   { path: '**', redirectTo: 'login' },
 ];
