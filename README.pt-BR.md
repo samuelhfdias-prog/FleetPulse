@@ -4,7 +4,7 @@
 
 </div>
 
-# Momesso Fleet Control
+# FleetPulse
 
 Aplicação full-stack para autenticação e gerenciamento multitenant de empresas, usuários e máquinas industriais. O projeto combina um painel Angular responsivo com uma API NestJS, persistência local em SQLite e controle de acesso por JWT.
 
@@ -114,8 +114,8 @@ As contas só são criadas quando `ENABLE_DEMO_SEED=true` (padrão apenas em des
 
 | Perfil | E-mail | Senha local padrão |
 | --- | --- | --- |
-| Administrador | `suporte@momesso.ind.br` | `123456` |
-| Usuário | `gerente@agroforte.com.br` | `123456` |
+| Administrador | `admin@fleetpulse.dev` | `123456` |
+| Usuário | `operator@fleetpulse.dev` | `123456` |
 
 Altere `DEMO_ADMIN_PASSWORD` e `DEMO_USER_PASSWORD` no `.env` ou desative o seed. A senha padrão nunca deve ser usada em produção.
 
@@ -173,7 +173,7 @@ Exemplo de login:
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"suporte@momesso.ind.br","password":"123456"}'
+  -d '{"email":"admin@fleetpulse.dev","password":"123456"}'
 ```
 
 ## Segurança implementada
@@ -212,7 +212,7 @@ npm run build
 Artefatos gerados:
 
 - API: `api/dist`;
-- painel: `Front-end/dist/teste_momesso/browser`.
+- painel: `Front-end/dist/fleetpulse/browser`.
 
 Para iniciar somente a API compilada:
 
@@ -268,7 +268,7 @@ Defina `JWT_SECRET` com ao menos 32 caracteres aleatórios. Não reutilize o val
 ## Estrutura
 
 ```text
-Teste-momesso/
+FleetPulse/
 ├── api/
 │   ├── src/common/           # guardas e decorators
 │   ├── src/modules/          # auth, companies, machines e users
