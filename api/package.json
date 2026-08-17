@@ -5,6 +5,10 @@
   "author": "Momesso Indústria",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.19 <24",
+    "npm": ">=10"
+  },
   "scripts": {
     "prebuild": "rimraf dist tsconfig.tsbuildinfo",
     "build": "nest build",
