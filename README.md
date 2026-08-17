@@ -2,7 +2,7 @@
 
 **English** | [Português](README.pt-BR.md)
 
-# Momesso Fleet Control
+# FleetPulse
 
 **Multitenant industrial fleet management with backend-enforced access control.**
 
@@ -101,8 +101,8 @@ Accounts are created only when `ENABLE_DEMO_SEED=true`, which is the default in 
 
 | Role | Email | Local password |
 | --- | --- | --- |
-| Administrator | `suporte@momesso.ind.br` | `123456` |
-| User | `gerente@agroforte.com.br` | `123456` |
+| Administrator | `admin@fleetpulse.dev` | `123456` |
+| User | `operator@fleetpulse.dev` | `123456` |
 
 Change `DEMO_ADMIN_PASSWORD` and `DEMO_USER_PASSWORD` or disable seeding. Default passwords must never be used in production.
 
@@ -160,7 +160,7 @@ Login example:
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"suporte@momesso.ind.br","password":"123456"}'
+  -d '{"email":"admin@fleetpulse.dev","password":"123456"}'
 ```
 
 ## Security highlights
@@ -199,7 +199,7 @@ npm run build
 Generated artifacts:
 
 - API: `api/dist`
-- Dashboard: `Front-end/dist/teste_momesso/browser`
+- Dashboard: `Front-end/dist/fleetpulse/browser`
 
 Start only the compiled API:
 
@@ -224,7 +224,7 @@ Backend tests cover environment validation and critical authorization rules. Ang
 ## Project structure
 
 ```text
-Teste-momesso/
+FleetPulse/
 |-- api/
 |   |-- src/common/           # guards and decorators
 |   |-- src/modules/          # auth, companies, machines and users
