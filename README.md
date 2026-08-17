@@ -46,9 +46,11 @@ The frontend uses the relative `/api` path. During development, Angular forwards
 
 ## Requirements
 
-- Node.js `20.19` or newer; Node 22 and 24 are also supported
+- Node.js `20.19` or newer, preferably Node 22 LTS
 - npm `10` or newer
 - Git
+
+Node 24 is not recommended for this repository because the native `sqlite3` driver may fail during installation on some environments.
 
 PostgreSQL, Docker and a separate SQLite installation are not required.
 
