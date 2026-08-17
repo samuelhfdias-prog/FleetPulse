@@ -1,7 +1,7 @@
 {
-  "name": "momesso",
+  "name": "fleetpulse",
   "version": "1.0.0",
-  "description": "Sistema de Gerenciamento de Parque de Máquinas - Agrícolas Industriais",
+  "description": "Sistema de gerenciamento multitenant de parque de máquinas industriais",
   "private": true,
   "scripts": {
     "install:all": "npm ci && npm --prefix api ci && npm --prefix Front-end ci",
@@ -24,7 +24,7 @@
     "machines",
     "iot"
   ],
-  "author": "Momesso",
+  "author": "Samuel Dias",
   "license": "MIT",
   "engines": {
     "node": ">=20.19 <24",
