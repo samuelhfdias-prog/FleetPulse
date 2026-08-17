@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "teste_momesso": {
+    "fleetpulse": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -65,10 +65,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "teste_momesso:build:production"
+              "buildTarget": "fleetpulse:build:production"
             },
             "development": {
-              "buildTarget": "teste_momesso:build:development"
+              "buildTarget": "fleetpulse:build:development"
             }
           },
           "defaultConfiguration": "development"
