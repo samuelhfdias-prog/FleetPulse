@@ -24,23 +24,23 @@ async function seedDemoData(app: Awaited<ReturnType<typeof NestFactory.create>>)
   if (!defaultCompany) {
     defaultCompany = await companyRepository.save(
       companyRepository.create({
-        name: 'Momesso Indústria',
+        name: 'FleetPulse Demo',
         document: '00000000000000',
         industry: 'Agroindústria',
-        contactEmail: 'contato@momesso.ind.br',
+        contactEmail: 'contato@fleetpulse.dev',
       }),
     );
   }
 
   const demoUsers = [
     {
-      email: 'suporte@momesso.ind.br',
+      email: 'admin@fleetpulse.dev',
       password: config.getOrThrow<string>('DEMO_ADMIN_PASSWORD'),
       fullName: 'Administrador Sistema',
       role: UserRole.ADMIN,
     },
     {
-      email: 'gerente@agroforte.com.br',
+      email: 'operator@fleetpulse.dev',
       password: config.getOrThrow<string>('DEMO_USER_PASSWORD'),
       fullName: 'Gerente Agroforte',
       role: UserRole.USER,
@@ -106,7 +106,7 @@ async function bootstrap() {
   const host = config.getOrThrow<string>('API_HOST');
   await app.listen(port, host);
 
-  console.log(`Momesso API disponível em http://localhost:${port}/api`);
+  console.log(`FleetPulse API disponível em http://localhost:${port}/api`);
 }
 
 void bootstrap();
