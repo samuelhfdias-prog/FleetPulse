@@ -26,6 +26,10 @@
   ],
   "author": "Momesso",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19 <24",
+    "npm": ">=10"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2"
   }
