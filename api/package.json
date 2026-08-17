@@ -1,8 +1,8 @@
 {
-  "name": "momesso-api",
+  "name": "fleetpulse-api",
   "version": "1.0.0",
-  "description": "Momesso Machine Park Management System - Backend API",
-  "author": "Momesso Indústria",
+  "description": "FleetPulse machine park management backend API",
+  "author": "Samuel Dias",
   "private": true,
   "license": "UNLICENSED",
   "engines": {
