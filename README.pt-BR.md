@@ -59,9 +59,11 @@ Navegador
 
 ## Pré-requisitos
 
-- Node.js `20.19` ou superior. Node 22 e 24 também são suportados.
+- Node.js `20.19` ou superior, de preferência Node 22 LTS.
 - npm `10` ou superior.
 - Git.
+
+Node 24 não é recomendado neste repositório porque o driver nativo `sqlite3` pode falhar durante a instalação em alguns ambientes.
 
 Não é necessário instalar PostgreSQL, Docker ou SQLite separadamente. O driver e o arquivo de banco são gerenciados pelo projeto.
 
